@@ -44,19 +44,40 @@ var app = {
                 // dump the raw json of the message
                 // note: real code will need to decode
                 // the payload from each record
-                alert(JSON.stringify(ndefMessage));
+                var messageAsJSON = JSON.stringify(ndefMessage);
+                console.log(messageAsJSON);
 
                 // assuming the first record in the message has
                 // a payload that can be converted to a string.
-                alert(nfc.bytesToString(ndefMessage[0].payload).substring(3));
+                var payloadAsText = nfc.bytesToString(ndefMessage[0].payload).substring(3);
+                console.log(payloadAsText);
+
+                var message = messageAsJSON + '\n\n' + payloadAsText;
+                navigator.notification.alert(message, {}, 'Found NDEF tag');
             },
             function () { // success callback
-                alert("Waiting for NDEF tag");
+                window.plugins.toast.showShortCenter('Listening for NDEF tags');
             },
             function (error) { // error callback
                 alert("Error adding NDEF listener " + JSON.stringify(error));
             }
         );
+
+        // Some devices can't read NDEF from Mifare Classic tag but can still get the tag id
+        // These include the Samsung S4 and Nexus 4.
+        nfc.addTagDiscoveredListener (
+            function (nfcEvent) {
+                var tag = nfcEvent.tag;
+                navigator.notification.alert(JSON.stringify(tag), {}, 'Found non-NDEF NFC tag');
+            },
+            function () { // success callback
+                console.log('Also listening for non-NDEF tags');
+            },
+            function (error) { // error callback
+                alert('Error adding NDEF listener ' + JSON.stringify(error));
+            }
+        );
+
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
