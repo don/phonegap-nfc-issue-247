@@ -23,4 +23,6 @@
         <allow-intent href="itms:*" />
         <allow-intent href="itms-apps:*" />
     </platform>
+    <plugin name="phonegap-nfc" spec="~0.6.6" />
+    <plugin name="cordova-plugin-dialogs" spec="~1.2.1" />
 </widget>
