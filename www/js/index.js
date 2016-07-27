@@ -35,6 +35,8 @@ var app = {
     onDeviceReady: function() {
         app.receivedEvent('deviceready');
 
+        // Add 3 listeners. Android is going to call the most specific one.
+
         // Read NDEF formatted NFC Tags
         nfc.addNdefListener (
             function (nfcEvent) {
@@ -72,6 +74,30 @@ var app = {
             },
             function () { // success callback
                 console.log('Also listening for non-NDEF tags');
+            },
+            function (error) { // error callback
+                alert('Error adding NDEF listener ' + JSON.stringify(error));
+            }
+        );
+
+        // look for NFC tags that can be formatted as NDEF
+        nfc.addNdefFormatableListener (
+            function (nfcEvent) {
+                // ignore the incoming event
+                // create a new message and write it to the tag
+                var ndefMessage = [ ndef.textRecord('Hello') ];
+                nfc.write(
+                    ndefMessage,
+                    function() {
+                        window.plugins.toast.showShortCenter('Wrote data to NFC tag');
+                    },
+                    function() {
+                        alert('ERROR: Failed to write message to NFC tag');
+                    }
+                );
+            },
+            function () { // success callback
+                console.log('Also listening for tags that are NDEF formatable tags');
             },
             function (error) { // error callback
                 alert('Error adding NDEF listener ' + JSON.stringify(error));
